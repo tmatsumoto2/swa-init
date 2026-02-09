@@ -9,46 +9,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Debug token presence (no secret reveal)
-        shell: bash
-        env:
-          SWA_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_MANGO_FIELD_0F7827D00 }}
-        run: |
-          if [ -z "$SWA_TOKEN" ]; then
-            echo "SWA_TOKEN is EMPTY (secret not injected)."
-            exit 1
-          fi
-          echo "SWA_TOKEN_LEN=${#SWA_TOKEN}"
-          echo -n "$SWA_TOKEN" | sha256sum | cut -c1-12 | xargs echo "SWA_TOKEN_SHA256_PREFIX="
-          
-      - name: Debug token format (no secret reveal)
-        shell: bash
-        env:
-          SWA_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_MANGO_FIELD_0F7827D00 }}
-        run: |
-          echo "LEN=${#SWA_TOKEN}"
-          # 改行が含まれるか（0ならOK、1以上ならNG）
-          echo -n "$SWA_TOKEN" | tr -cd '\n' | wc -c | xargs echo "NEWLINES="
-          # キャリッジリターン(\r)が含まれるか（Windowsコピーで混入しがち）
-          echo -n "$SWA_TOKEN" | tr -cd '\r' | wc -c | xargs echo "CARRIAGE_RETURNS="
-          # 目に見えない空白類（タブ等）が含まれるか（0が望ましい）
-          echo -n "$SWA_TOKEN" | tr -cd '\t ' | wc -c | xargs echo "TABS_OR_SPACES_INSIDE="
-
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_MANGO_FIELD_0F7827D00 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-
-          # index.html が直下ならこれ
           app_location: "."
           output_location: ""
           skip_app_build: true
-
-          # APIは使わない
           api_location: ""
           skip_api_build: true
-
-
-
+          data_api_location: ""
